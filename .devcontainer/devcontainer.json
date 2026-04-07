@@ -1,0 +1,33 @@
+{
+    "name": "Data Agents",
+    "build": {
+        "dockerfile": "./Dockerfile",
+        "context": "..",
+        "args": {
+            "PYTHON_VERSION": "3.12.12"
+        }
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "esbenp.prettier-vscode",
+                "ms-azuretools.vscode-docker",
+                "ms-python.black-formatter",
+                "ms-python.python",
+                "ms-python.vscode-pylance"
+            ],
+            "settings": {
+                "terminal.integrated.defaultProfile.linux": "bash",
+                "terminal.integrated.profiles.linux": {
+                    "bash": {
+                        "path": "/bin/bash"
+                    }
+                }
+            }
+        }
+    },
+    "features": {},
+    "remoteUser": "vscode",
+    "workspaceFolder": "/workspace",
+    "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached"
+}

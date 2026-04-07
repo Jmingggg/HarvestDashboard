@@ -1,0 +1,18 @@
+[project]
+name = "workspace"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "holidays>=0.94",
+    "matplotlib>=3.10.8",
+    "numpy>=2.4.4",
+    "pandas>=3.0.2",
+    "plotly>=6.6.0",
+    "pyarrow>=23.0.1",
+    "streamlit>=1.56.0",
+]
+
+[tool.uv]
+link-mode = "copy"
