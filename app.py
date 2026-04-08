@@ -431,11 +431,11 @@ with tab_employee:
                "#06b6d4","#ec4899","#84cc16","#6366f1"]
     client_colors = {c: palette[i % len(palette)] for i, c in enumerate(all_clients)}
 
-    def short_name(e):
-        parts = e.split()
-        return parts[0] + (" " + parts[1][0] + "." if len(parts) > 1 else "")
+    # def short_name(e):
+    #     parts = e.split()
+    #     return parts[0] + (" " + parts[1][0] + "." if len(parts) > 1 else "")
 
-    subplot_titles = [short_name(e) for e in all_employees]
+    subplot_titles = [e for e in all_employees]
 
     fig6 = make_subplots(
         rows=n_rows, cols=n_cols,
