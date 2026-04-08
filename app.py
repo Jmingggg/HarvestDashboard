@@ -144,19 +144,19 @@ def classify_date(d):
 def load_data(file) -> pd.DataFrame:
     df = pd.read_csv(file)
     df["Date"] = pd.to_datetime(df["Date"]).dt.date
-    df["Billable"]    = df["Type"] == "Billable"
+    df["Billable"] = df["Type"] == "Billable"
     df["Out of Work"] = df["Type"] == "Out of Work"
     df["NonBillable"] = (~df["Billable"]) & (~df["Out of Work"])
-    df["DateClass"]   = df["Date"].map(classify_date)
+    df["DateClass"] = df["Date"].map(classify_date)
     return df
 
 def fmt_hours(h: float) -> str:
     return f"{h:,.1f} hrs"
 
 COLORS = {
-    "billable":     "#4f8ef7",
-    "nonbillable":  "#f7974f",
-    "outofwork":    "#6b7394",
+    "billable": "#4f8ef7",
+    "nonbillable": "#f7974f",
+    "outofwork": "#6b7394",
     "weekend_fill": "rgba(247,151,79,0.25)",
     "holiday_fill": "rgba(247,97,79,0.25)",
 }
@@ -237,21 +237,21 @@ if df.empty:
     st.stop()
 
 # ─── KPI row ────────────────────────────────────────────────────────────────────
-total_h      = df["Hours"].sum()
-billable_h   = df[df["Billable"]]["Hours"].sum()
-nonbill_h    = df[df["NonBillable"]]["Hours"].sum()
-oow_h        = df[df["Out of Work"]]["Hours"].sum()
-util_rate    = billable_h / total_h * 100 if total_h else 0
-num_emp      = df["Employee"].nunique()
+total_h = df["Hours"].sum()
+billable_h = df[df["Billable"]]["Hours"].sum()
+nonbill_h = df[df["NonBillable"]]["Hours"].sum()
+oow_h = df[df["Out of Work"]]["Hours"].sum()
+util_rate = billable_h / total_h * 100 if total_h else 0
+num_emp = df["Employee"].nunique()
 
 st.markdown('<p class="section-label" style="margin-top:8px;">Overview</p>', unsafe_allow_html=True)
 k1, k2, k3, k4, k5, k6 = st.columns(6)
-k1.metric("Employees",      num_emp)
-k2.metric("Total Hours",    fmt_hours(total_h))
-k3.metric("Billable",       fmt_hours(billable_h), f"{util_rate:.1f}% of total")
-k4.metric("Non-Billable",   fmt_hours(nonbill_h))
-k5.metric("Out of Work",    fmt_hours(oow_h))
-k6.metric("Utilisation",    f"{util_rate:.1f}%", delta_color="normal")
+k1.metric("Employees", num_emp)
+k2.metric("Total Hours", fmt_hours(total_h))
+k3.metric("Billable", fmt_hours(billable_h), f"{util_rate:.1f}% of total")
+k4.metric("Non-Billable", fmt_hours(nonbill_h))
+k5.metric("Out of Work", fmt_hours(oow_h))
+k6.metric("Utilisation", f"{util_rate:.1f}%", delta_color="normal")
 
 st.divider()
 
@@ -348,16 +348,24 @@ with tab_client:
 
     # Table
     st.markdown("#### Detail Table")
-    display_client = client_df.rename(columns={
-        "Client (Harvest)":"Client",
-        "TotalHours":"Total Hours",
-        "BillableHours":"Billable Hours",
-        "Utilisation":"Utilisation %"
+    client_task_df = df.groupby(["Client (Harvest)", "Task"]).agg(
+        TotalHours=("Hours","sum"),
+        BillableHours=("Hours", lambda x: x[df.loc[x.index,"Billable"]].sum())
+    ).reset_index()
+    client_totals = client_task_df.groupby("Client (Harvest)")["TotalHours"].transform("sum")
+    client_task_df = client_task_df.assign(ClientTotal=client_totals).sort_values(
+        by=["ClientTotal", "TotalHours"], ascending=[False, False]
+    ).drop(columns="ClientTotal")
+    display_client = client_task_df.rename(columns={
+        "Client (Harvest)": "Client",
+        "Task": "Task",
+        "TotalHours": "Total Hours",
+        "BillableHours": "Billable Hours"
     })
     st.dataframe(
         display_client.style
             .background_gradient(subset=["Total Hours"], cmap="Blues")
-            .format({"Total Hours":"{:.1f}","Billable Hours":"{:.1f}","Utilisation %":"{:.1f}%"}),
+            .format({"Total Hours": "{:.1f}", "Billable Hours": "{:.1f}"}),
         width="stretch", hide_index=True
     )
 
@@ -431,13 +439,29 @@ with tab_employee:
     n_rows = math.ceil(n_emp / n_cols)
 
     all_clients = sorted(emp_client["Client (Harvest)"].unique().tolist())
-    palette = ["#2563eb","#f59e0b","#10b981","#ef4444","#8b5cf6","#f97316",
-               "#06b6d4","#ec4899","#84cc16","#6366f1"]
+    palette = [
+        "#2563eb",  # Blue
+        "#f59e0b",  # Amber
+        "#10b981",  # Emerald
+        "#ef4444",  # Red
+        "#8b5cf6",  # Violet
+        "#f97316",  # Orange
+        "#06b6d4",  # Cyan
+        "#ec4899",  # Pink
+        "#84cc16",  # Lime
+        "#6366f1",  # Indigo
+        "#14b8a6",  # Teal
+        "#f43f5e",  # Rose
+        "#a855f7",  # Purple
+        "#eab308",  # Yellow
+        "#22c55e",  # Green
+        "#0ea5e9",  # Sky
+        "#d946ef",  # Fuchsia
+        "#fb923c",  # Light Orange
+        "#4ade80",  # Light Green  
+        "#818cf8",  # Light Indigo
+    ]
     client_colors = {c: palette[i % len(palette)] for i, c in enumerate(all_clients)}
-
-    # def short_name(e):
-    #     parts = e.split()
-    #     return parts[0] + (" " + parts[1][0] + "." if len(parts) > 1 else "")
 
     subplot_titles = [e for e in all_employees]
 
