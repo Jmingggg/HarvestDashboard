@@ -372,6 +372,11 @@ with tab_employee:
     ).reset_index()
     emp_df["Utilisation"] = (emp_df["BillableHours"] / emp_df["TotalHours"] * 100).round(1)
     emp_df = emp_df.sort_values("Utilisation", ascending=False)
+    
+    # Expected hours = every weekday (Mon-Fri) in selected date range x n hrs
+    average_hours = 7
+    all_days = pd.date_range(start=start_d, end=end_d, freq="D")
+    expected_hours = sum(average_hours for d in all_days if d.weekday() < 5)
 
     fig5 = go.Figure()
     fig5.add_trace(go.Bar(name="Billable", x=emp_df["Employee"], y=emp_df["BillableHours"],
@@ -380,7 +385,14 @@ with tab_employee:
                           marker_color="#f59e0b"))
     fig5.add_trace(go.Bar(name="Out of Work", x=emp_df["Employee"], y=emp_df["OutOfWorkHours"],
                           marker_color="#94a3b8"))
-    fig5.update_layout(**PLOTLY_LAYOUT, barmode="stack", height=360,
+    fig5.add_hline(
+        y=expected_hours,
+        line=dict(color="#ef4444", width=2, dash="dash"),
+        annotation_text=f"Expected: {expected_hours} hrs",
+        annotation_position="top right",
+        annotation=dict(font=dict(color="#ef4444", size=12), bgcolor="rgba(255,255,255,0.8)"),
+    )
+    fig5.update_layout(**PLOTLY_LAYOUT, barmode="stack", height=500,
                        yaxis=dict(gridcolor="#e2e8f0"), xaxis=dict(tickangle=-30))
     st.plotly_chart(fig5, width="stretch")
 
