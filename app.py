@@ -336,10 +336,14 @@ with tab_client:
                   orientation="h", color="Utilisation",
                   color_continuous_scale=["#dbeafe","#2563eb","#10b981"],
                   hover_data={"BillableHours":":.1f","Utilisation":":.1f"},
-                  labels={"TotalHours":"Total Hours","Client (Harvest)":"Client"})
+                  labels={"TotalHours":"Total Hours","Client (Harvest)":"Client"},
+                  text=client_df["TotalHours"].map(lambda h: f"{h:,.1f} hrs"))
+    fig4.update_traces(textposition="outside", textfont=dict(size=12, color="#1e293b"))
     fig4.update_layout(**PLOTLY_LAYOUT, height=max(300, len(client_df)*38),
                        yaxis=dict(categoryorder="total ascending", gridcolor="#e2e8f0"),
-                       coloraxis_colorbar=dict(title="Util %"))
+                       coloraxis_colorbar=dict(title="Util %"),
+                       uniformtext_minsize=10, uniformtext_mode="hide",
+                       xaxis=dict(range=[0, client_df["TotalHours"].max() * 1.18]))
     st.plotly_chart(fig4, width="stretch")
 
     # Table
