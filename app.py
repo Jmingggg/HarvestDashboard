@@ -140,7 +140,7 @@ def classify_date(d):
         return "weekend"
     return "workday"
 
-@st.cache_data()
+@st.cache_data
 def load_data(file) -> pd.DataFrame:
     df = pd.read_csv(file)
     df["Date"] = pd.to_datetime(df["Date"]).dt.date
