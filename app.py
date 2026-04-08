@@ -407,7 +407,7 @@ with tab_employee:
                     padding:18px 16px; margin-bottom:12px; text-align:center;
                     box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
             <div style="font-size:.72rem; color:#64748b; letter-spacing:.08em; text-transform:uppercase; margin-bottom:6px;">
-                {row['Employee'].split()[0]}
+                {row['Employee']}
             </div>
             <div style="font-size:1.8rem; font-weight:700; color:{color}; font-family:'DM Serif Display',serif;">
                 {row['Utilisation']:.0f}%
