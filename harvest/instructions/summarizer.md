@@ -43,7 +43,7 @@ For each employee calculate:
 - Total billable hours
 - Total productive (non-billable) hours
 - Billable utilisation rate (billable ÷ total × 100%)
-- Flag employees below 60% billable rate with ⚠️
+- Flag employees below 60% billable rate with ⚠️ (leave empty when above 60%)
 
 Present as a table with columns: Employee | Billable Hours | Productive Hours | Total Hours | Billable Rate | Flag
 
