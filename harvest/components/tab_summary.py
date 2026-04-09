@@ -2,6 +2,9 @@ import os
 import time
 import pandas as pd
 import streamlit as st
+from harvest.agents import build_summarizer_agent
+ 
+agent = build_summarizer_agent()
 
 
 def _build_prompt(
@@ -97,9 +100,6 @@ def render_tab_summary(
  
         with st.spinner("Analysing workforce data…"):
             try:
-                from harvest.agents import build_summarizer_agent
- 
-                agent = build_summarizer_agent()
                 start_time = time.time()
                 response = agent.run(prompt)
                 end_time = time.time()
