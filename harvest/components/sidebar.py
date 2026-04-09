@@ -1,13 +1,7 @@
-"""
-Sidebar component: file upload, filters, and legend.
-Returns the loaded raw DataFrame plus the current filter selections.
-"""
-from __future__ import annotations
-
 import streamlit as st
 import pandas as pd
 
-from ..utils.data_loader import load_data
+from harvest.utils import load_data
 
 
 def render_sidebar() -> tuple[pd.DataFrame | None, list, list, object, object]:

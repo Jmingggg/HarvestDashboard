@@ -1,10 +1,7 @@
-"""
-KPI row component: renders the six top-level metric cards.
-"""
 import streamlit as st
 import pandas as pd
 
-from ..utils.data_loader import fmt_hours
+from harvest.utils import fmt_hours
 
 
 def render_kpi_row(df: pd.DataFrame) -> tuple[float, float, float]:
