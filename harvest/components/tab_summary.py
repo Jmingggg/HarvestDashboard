@@ -1,3 +1,4 @@
+import os
 import time
 import pandas as pd
 import streamlit as st
@@ -59,7 +60,11 @@ def render_tab_summary(
     )
  
     # ── Controls row ─────────────────────────────────────────────────────
-    col_btn, col_info = st.columns([1, 4])
+    key_input, col_btn, col_info = st.columns([3, 1, 1], vertical_alignment="bottom")
+    os.environ["API_KEY"] = key_input.text_input(
+        label="GEMINI API KEY",
+        type="password"
+    )
     generate = col_btn.button("✨ Generate Report", type="primary", use_container_width=True)
     col_info.markdown(
         f'<span style="color:#94a3b8; font-size:0.82rem;">'
