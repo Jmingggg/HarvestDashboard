@@ -63,7 +63,8 @@ def render_tab_summary(
     key_input, col_btn, col_info = st.columns([3, 1, 1], vertical_alignment="bottom")
     os.environ["API_KEY"] = key_input.text_input(
         label="GEMINI API KEY",
-        type="password"
+        type="password",
+        help="Get your API key from https://aistudio.google.com/api-keys"
     )
     generate = col_btn.button("✨ Generate Report", type="primary", use_container_width=True)
     col_info.markdown(
