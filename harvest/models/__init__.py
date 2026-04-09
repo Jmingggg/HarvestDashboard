@@ -19,4 +19,3 @@ def get_grok() -> xAI:
         provider="xAI",
         api_key=config.API_KEY,
     )
-

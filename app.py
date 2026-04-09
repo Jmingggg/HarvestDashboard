@@ -75,32 +75,4 @@ with tab_pivot:
     hours_pivot = render_tab_pivot(df)
     
 with tab_summary:
-    st.dataframe(
-        data=client_task,
-        width="stretch",
-        hide_index=True
-    )
-    st.markdown("---")
-    
-    st.dataframe(
-        data=emp_df,
-        width="stretch",
-        hide_index=True
-    )
-    st.markdown("---")
-    
-    st.dataframe(
-        data=emp_client,
-        width="stretch",
-        hide_index=True
-    )
-    st.markdown("---")
-    
-    st.dataframe(
-        data=hours_pivot,
-        width="stretch",
-        hide_index=True
-    )
-    st.markdown("---")
-    
-    
+    None
