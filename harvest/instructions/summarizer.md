@@ -25,8 +25,8 @@ Analyse these data and produce a workforce utilisation summary report.
 ### 1. Capacity Status per Employee
 For each employee, sum their total hours logged per day across the reporting period.
 - 🔴 **Overloaded** — daily hours consistently exceed 8 hours
-- 🟢 **Has Capacity** — daily hours consistently below 6 hours
 - 🟡 **Balanced** — daily hours roughly between 6–8 hours
+- 🟢 **Has Capacity** — daily hours consistently below 6 hours
 - Note employees with highly irregular patterns (some days very high, some very low)
 
 Present as a table with columns: Employee | Avg Daily Hours | Status | Notes
@@ -46,7 +46,8 @@ For each employee calculate:
 - Flag employees below 60% billable rate with ⚠️
 
 Present as a table with columns: Employee | Billable Hours | Productive Hours | Total Hours | Billable Rate | Flag
-Add the meaning of Flag after the table.
+
+_**Add the meaning of Flag after the table._
 
 ### 4. Multi-Client Context Switching
 Identify employees juggling 4 or more distinct clients on a single day, which may indicate overload from context-switching.
