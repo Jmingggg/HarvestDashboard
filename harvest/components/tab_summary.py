@@ -18,9 +18,9 @@ def _build_prompt(
         return frame.head(max_rows).to_markdown(index=False)
  
     sections = [
-        "## Raw Time Entries (sample)\n" + df_to_md(
-            df[["Employee", "Date", "Client (Harvest)", "Task", "Hours", "Type", "DateClass"]]
-        ),
+        # "## Raw Time Entries (sample)\n" + df_to_md(
+        #     df[["Employee", "Date", "Client (Harvest)", "Task", "Hours", "Type", "DateClass"]]
+        # ),
         "## Employee Performance Summary\n" + df_to_md(emp_df),
         "## Employee × Client Hours\n" + df_to_md(emp_client),
         "## Client × Task Detail\n" + df_to_md(client_task),
@@ -89,6 +89,8 @@ def render_tab_summary(
  
                 agent = build_summarizer_agent()
                 response = agent.run(prompt)
+                
+                total_tokens = response.metrics.total_tokens
  
                 # agno agents return a RunResponse; extract markdown content
                 if hasattr(response, "content"):
