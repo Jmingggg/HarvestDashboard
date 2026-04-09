@@ -1,6 +1,8 @@
 from agno.agent import Agent
-from models import get_gemini, get_grok
-from config import config
+from ..models import get_gemini, get_grok
+from harvest.config import ModelConfig
+
+config = ModelConfig()
 
 
 def load_instructions(filename: str) -> str:

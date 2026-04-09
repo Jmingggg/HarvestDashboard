@@ -15,6 +15,7 @@ dependencies = [
     "plotly>=6.6.0",
     "pyarrow>=23.0.1",
     "streamlit>=1.56.0",
+    "tabulate>=0.10.0",
 ]
 
 [tool.uv]

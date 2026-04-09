@@ -29,14 +29,14 @@ For each employee, sum their total hours logged per day across the reporting per
 - 🟡 **Balanced** — daily hours roughly between 6–8 hours
 - Note employees with highly irregular patterns (some days very high, some very low)
 
-Present as a table with columns: Employee | Team | Avg Daily Hours | Status | Notes
+Present as a table with columns: Employee | Avg Daily Hours | Status | Notes
 
 ### 2. Off-Day / Weekend Work Detection
 Identify any entries logged on weekends (Saturday or Sunday).
-- List the employee name, date, day of week, and total hours worked
+- List the employee name, day of week, and total hours worked
 - Flag with ⚠️
 
-Present as a table with columns: Employee | Date | Day | Hours Logged | Flag
+Present as a table with columns: Employee | Day | Hours Logged | Flag
 
 ### 3. Billable vs Non-Billable Breakdown
 For each employee calculate:
@@ -50,7 +50,7 @@ Present as a table with columns: Employee | Billable Hours | Productive Hours | 
 ### 4. Multi-Client Context Switching
 Identify employees juggling 4 or more distinct clients on a single day, which may indicate overload from context-switching.
 
-Present as a table with columns: Employee | Date | No. of Clients | Clients
+Present as a table with columns: Employee | No. of Clients | Clients
 
 ### 5. Top 5 Clients by Total Hours
 List the top 5 clients ranked by total hours logged across all employees.

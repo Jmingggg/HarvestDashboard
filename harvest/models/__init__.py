@@ -1,6 +1,8 @@
 from agno.models.google import Gemini
 from agno.models.xai import xAI
-from config import config
+from harvest.config.model import ModelConfig
+
+config = ModelConfig()
 
 
 def get_gemini() -> Gemini:

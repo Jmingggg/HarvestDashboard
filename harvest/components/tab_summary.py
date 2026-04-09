@@ -75,24 +75,25 @@ def render_tab_summary(
         st.session_state["summary_report"] = None
     if "summary_error" not in st.session_state:
         st.session_state["summary_error"] = None
+    if "total_tokens" not in st.session_state:
+        st.session_state["total_tokens"] = None
  
     if generate:
         st.session_state["summary_report"] = None
         st.session_state["summary_error"] = None
+        st.session_state["total_tokens"] = None
  
         prompt = _build_prompt(df, emp_df, emp_client, client_task, hours_pivot)
  
         with st.spinner("🤖 Analysing workforce data…"):
             try:
-                # Import here to avoid hard dependency at module load time
-                from harvest.agents.summarizer import build_summarizer_agent  # noqa: PLC0415
+                from harvest.agents import build_summarizer_agent
  
                 agent = build_summarizer_agent()
                 response = agent.run(prompt)
                 
-                total_tokens = response.metrics.total_tokens
+                st.session_state["total_tokens"] = response.metrics.total_tokens
  
-                # agno agents return a RunResponse; extract markdown content
                 if hasattr(response, "content"):
                     report_md = response.content
                 else:
@@ -114,24 +115,20 @@ def render_tab_summary(
  
     elif st.session_state["summary_report"]:
         report_md: str = st.session_state["summary_report"]
- 
-        # Render inside a styled card
-        st.markdown(
-            '<div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:16px; '
-            'padding:32px 36px; box-shadow:0 2px 12px rgba(0,0,0,0.06);">',
-            unsafe_allow_html=True,
-        )
         st.markdown(report_md)
-        st.markdown("</div>", unsafe_allow_html=True)
- 
-        # Download button
-        st.download_button(
-            label="⬇️ Download Report (Markdown)",
-            data=report_md,
-            file_name="harvest_utilisation_report.md",
-            mime="text/markdown",
-            use_container_width=False,
-        )
+
+        bottom_cols = st.columns((1, 1, 1, 1))
+        with bottom_cols[-1]: 
+            # Download button
+            st.download_button(
+                label="⬇️ Download Report (Markdown)",
+                data=report_md,
+                file_name="harvest_utilisation_report.md",
+                mime="text/markdown",
+                use_container_width=False,
+            )
+            
+            st.metric("Total Tokens", f"{st.session_state['total_tokens']:,}")
  
     else:
         # Empty state
