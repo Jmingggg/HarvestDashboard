@@ -13,7 +13,7 @@ def load_instructions(filename: str) -> str:
 def build_summarizer_agent() -> Agent:
     return Agent(
         name="Summarizer",
-        model=get_grok(),
+        model=get_gemini(),
         instructions=load_instructions("summarizer.md"),
         markdown=True
     )

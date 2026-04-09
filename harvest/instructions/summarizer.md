@@ -70,4 +70,4 @@ Use a bullet list to highlight:
 
 ---
 
-Be specific — name employees, dates, and clients. Avoid vague generalisations.
+Be specific — name of employees and clients. Avoid vague generalisations.

@@ -1,3 +1,4 @@
+import time
 import pandas as pd
 import streamlit as st
 
@@ -75,23 +76,29 @@ def render_tab_summary(
         st.session_state["summary_report"] = None
     if "summary_error" not in st.session_state:
         st.session_state["summary_error"] = None
+    if "response_time" not in st.session_state:
+        st.session_state["response_time"] = None
     if "total_tokens" not in st.session_state:
         st.session_state["total_tokens"] = None
  
     if generate:
         st.session_state["summary_report"] = None
         st.session_state["summary_error"] = None
+        st.session_state["response_time"] = None
         st.session_state["total_tokens"] = None
  
         prompt = _build_prompt(df, emp_df, emp_client, client_task, hours_pivot)
  
-        with st.spinner("🤖 Analysing workforce data…"):
+        with st.spinner("Analysing workforce data…"):
             try:
                 from harvest.agents import build_summarizer_agent
  
                 agent = build_summarizer_agent()
+                start_time = time.time()
                 response = agent.run(prompt)
+                end_time = time.time()
                 
+                st.session_state["response_time"] = end_time - start_time
                 st.session_state["total_tokens"] = response.metrics.total_tokens
  
                 if hasattr(response, "content"):
@@ -117,9 +124,24 @@ def render_tab_summary(
         report_md: str = st.session_state["summary_report"]
         st.markdown(report_md)
 
-        bottom_cols = st.columns((1, 1, 1, 1))
-        with bottom_cols[-1]: 
-            # Download button
+        time_card, token_card, _, download_card = st.columns(
+            spec=(1, 1, 1, 1),
+            vertical_alignment="bottom"
+        )
+        
+        with time_card:
+            st.metric(
+                label="⏱️ Response Time",
+                value=f"{st.session_state['response_time']:.2f}s"
+            )
+
+        with token_card:
+            st.metric(
+                label="🪙 Total Tokens",
+                value=f"{st.session_state['total_tokens']:,}"
+            )
+            
+        with download_card:
             st.download_button(
                 label="⬇️ Download Report (Markdown)",
                 data=report_md,
@@ -127,8 +149,6 @@ def render_tab_summary(
                 mime="text/markdown",
                 use_container_width=False,
             )
-            
-            st.metric("Total Tokens", f"{st.session_state['total_tokens']:,}")
  
     else:
         # Empty state
