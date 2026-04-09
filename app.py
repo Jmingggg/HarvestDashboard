@@ -58,18 +58,49 @@ nonbill_h = df[df["NonBillable"]]["Hours"].sum()
 oow_h     = df[df["Out of Work"]]["Hours"].sum()
 
 # ─── Tabs ───────────────────────────────────────────────────────────────────────
-tab_overview, tab_client, tab_employee, tab_pivot = st.tabs([
-    "📊 Overview", "🏢 By Client", "👤 By Employee", "📅 Hours Pivot"
+tab_overview, tab_client, tab_employee, tab_pivot, tab_summary = st.tabs([
+    "📊 Overview", "🏢 By Client", "👤 By Employee", "📅 Hours Pivot", "📝 Summary"
 ])
 
 with tab_overview:
     render_tab_overview(df, billable_h, nonbill_h, oow_h, util_rate)
 
 with tab_client:
-    render_tab_client(df)
+    client_task = render_tab_client(df)
 
 with tab_employee:
-    render_tab_employee(df, start_d, end_d)
+    emp_df, emp_client = render_tab_employee(df, start_d, end_d)
 
 with tab_pivot:
-    render_tab_pivot(df)
+    hours_pivot = render_tab_pivot(df)
+    
+with tab_summary:
+    st.dataframe(
+        data=client_task,
+        width="stretch",
+        hide_index=True
+    )
+    st.markdown("---")
+    
+    st.dataframe(
+        data=emp_df,
+        width="stretch",
+        hide_index=True
+    )
+    st.markdown("---")
+    
+    st.dataframe(
+        data=emp_client,
+        width="stretch",
+        hide_index=True
+    )
+    st.markdown("---")
+    
+    st.dataframe(
+        data=hours_pivot,
+        width="stretch",
+        hide_index=True
+    )
+    st.markdown("---")
+    
+    

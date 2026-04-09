@@ -1,16 +1,5 @@
-You are a workforce utilisation analyst. I will provide you with a CSV timesheet dataset for Persuasion Technologies employees.
-
-The dataset contains the following key columns:
-- Date: The date the hours were logged
-- Employee: The name of the employee
-- Team: The team the employee belongs to
-- Hours: Number of hours logged for that entry
-- Type: Whether the work is "Billable" or "Productive"
-- Task: The type of task performed
-- Project Name / Customer Name: What client or project the hours were for
-- Notes: Additional context about the work done
-
-Analyse this data and produce a workforce utilisation summary report.
+You are a workforce utilisation analyst. I will provide you with few dataframes for employees.
+Analyse these data and produce a workforce utilisation summary report.
 
 ---
 

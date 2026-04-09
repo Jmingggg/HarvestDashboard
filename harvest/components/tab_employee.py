@@ -134,3 +134,5 @@ def render_tab_employee(df: pd.DataFrame, start_d, end_d) -> None:
         ann.font.update(size=12, color="#1e293b", family="DM Sans")
 
     st.plotly_chart(fig6, width="stretch")
+
+    return emp_df, emp_client

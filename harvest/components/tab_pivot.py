@@ -31,7 +31,7 @@ def render_tab_pivot(df: pd.DataFrame) -> None:
     st.markdown(
         '<span class="badge badge-normal">Workday</span>&nbsp;'
         '<span class="badge badge-weekend">Weekend</span>&nbsp;'
-        '<span class="badge badge-holiday">🏖 Public Holiday</span>',
+        '<span class="badge badge-holiday">Public Holiday</span>',
         unsafe_allow_html=True,
     )
     st.markdown("<br>", unsafe_allow_html=True)
@@ -81,3 +81,5 @@ def render_tab_pivot(df: pd.DataFrame) -> None:
         width="stretch",
         hide_index=True,
     )
+    
+    return summary

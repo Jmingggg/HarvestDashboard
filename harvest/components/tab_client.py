@@ -67,6 +67,7 @@ def render_tab_client(df: pd.DataFrame) -> None:
     )
     display_client = client_task_df.rename(columns={
         "Client (Harvest)": "Client",
+        "Task": "Task",
         "TotalHours": "Total Hours",
         "BillableHours": "Billable Hours",
     })
@@ -77,3 +78,5 @@ def render_tab_client(df: pd.DataFrame) -> None:
         width="stretch",
         hide_index=True,
     )
+    
+    return display_client
