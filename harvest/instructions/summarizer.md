@@ -43,9 +43,10 @@ For each employee calculate:
 - Total billable hours
 - Total productive (non-billable) hours
 - Billable utilisation rate (billable ÷ total × 100%)
-- Flag employees below 60% billable rate with 📋
+- Flag employees below 60% billable rate with ⚠️
 
 Present as a table with columns: Employee | Billable Hours | Productive Hours | Total Hours | Billable Rate | Flag
+Add the meaning of Flag after the table.
 
 ### 4. Multi-Client Context Switching
 Identify employees juggling 4 or more distinct clients on a single day, which may indicate overload from context-switching.
