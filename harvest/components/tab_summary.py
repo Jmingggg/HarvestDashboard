@@ -34,15 +34,9 @@ def _build_prompt(
 
 
 def _get_agent(api_key: str):
-    """
-    Cache the agent per API key. Rebuilds only when the key changes.
-    Using st.cache_resource with a key-based hash.
-    """
-    @st.cache_resource(hash_funcs={str: lambda s: s})
+    @st.cache_resource
     def _build(key: str):
-        os.environ["API_KEY"] = key  # set BEFORE building
-        return build_summarizer_agent()
-
+        return build_summarizer_agent(api_key=key)
     return _build(api_key)
 
 
