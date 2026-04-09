@@ -5,6 +5,34 @@ import streamlit as st
 from harvest.agents import build_summarizer_agent
 
 
+def _build_prompt(
+    df: pd.DataFrame,
+    emp_df: pd.DataFrame,
+    emp_client: pd.DataFrame,
+    client_task: pd.DataFrame,
+    hours_pivot: pd.DataFrame,
+) -> str:
+    """
+    Serialise the dataframes into a structured prompt string for the summarizer agent.
+    Converts DataFrames to compact markdown tables so the LLM can read them easily.
+    """
+ 
+    def df_to_md(frame: pd.DataFrame, max_rows: int = 200) -> str:
+        return frame.head(max_rows).to_markdown(index=False)
+ 
+    sections = [
+        # "## Raw Time Entries (sample)\n" + df_to_md(
+        #     df[["Employee", "Date", "Client (Harvest)", "Task", "Hours", "Type", "DateClass"]]
+        # ),
+        "## Employee Performance Summary\n" + df_to_md(emp_df),
+        "## Employee × Client Hours\n" + df_to_md(emp_client),
+        "## Client × Task Detail\n" + df_to_md(client_task),
+        "## Daily Hours Pivot (Employee × Date)\n" + df_to_md(hours_pivot),
+    ]
+ 
+    return "\n\n---\n\n".join(sections)
+
+
 def _get_agent(api_key: str):
     """
     Cache the agent per API key. Rebuilds only when the key changes.
