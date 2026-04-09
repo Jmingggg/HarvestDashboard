@@ -14,6 +14,7 @@ from harvest.components import (
     render_tab_client,
     render_tab_employee,
     render_tab_pivot,
+    render_tab_summary
 )
 from harvest.utils import apply_filters
 
@@ -75,4 +76,10 @@ with tab_pivot:
     hours_pivot = render_tab_pivot(df)
     
 with tab_summary:
-    None
+    render_tab_summary(
+        df=df,
+        emp_df=emp_df,
+        emp_client=emp_client,
+        client_task=client_task,
+        hours_pivot=hours_pivot,
+    )

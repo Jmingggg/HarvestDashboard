@@ -5,6 +5,7 @@ from .tab_overview import render_tab_overview
 from .tab_client import render_tab_client
 from .tab_employee import render_tab_employee
 from .tab_pivot import render_tab_pivot
+from .tab_summary import render_tab_summary
 
 __all__ = [
     "inject_css",
@@ -14,4 +15,5 @@ __all__ = [
     "render_tab_client",
     "render_tab_employee",
     "render_tab_pivot",
+    "render_tab_summary"
 ]
