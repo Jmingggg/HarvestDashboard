@@ -3,8 +3,6 @@ import time
 import pandas as pd
 import streamlit as st
 from harvest.agents import build_summarizer_agent
- 
-agent = build_summarizer_agent()
 
 
 def _build_prompt(
@@ -77,9 +75,11 @@ def render_tab_summary(
         f"{len(df):,} time entries</span>",
         unsafe_allow_html=True,
     )
- 
+
+    agent = build_summarizer_agent()
+
     st.divider()
- 
+
     # ── Session-state cache so report survives reruns ─────────────────────
     if "summary_report" not in st.session_state:
         st.session_state["summary_report"] = None
@@ -89,15 +89,15 @@ def render_tab_summary(
         st.session_state["response_time"] = None
     if "total_tokens" not in st.session_state:
         st.session_state["total_tokens"] = None
- 
+
     if generate:
         st.session_state["summary_report"] = None
         st.session_state["summary_error"] = None
         st.session_state["response_time"] = None
         st.session_state["total_tokens"] = None
- 
+
         prompt = _build_prompt(df, emp_df, emp_client, client_task, hours_pivot)
- 
+
         with st.spinner("Analysing workforce data…"):
             try:
                 start_time = time.time()
