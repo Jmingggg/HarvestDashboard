@@ -5,32 +5,17 @@ import streamlit as st
 from harvest.agents import build_summarizer_agent
 
 
-def _build_prompt(
-    df: pd.DataFrame,
-    emp_df: pd.DataFrame,
-    emp_client: pd.DataFrame,
-    client_task: pd.DataFrame,
-    hours_pivot: pd.DataFrame,
-) -> str:
+def _get_agent(api_key: str):
     """
-    Serialise the dataframes into a structured prompt string for the summarizer agent.
-    Converts DataFrames to compact markdown tables so the LLM can read them easily.
+    Cache the agent per API key. Rebuilds only when the key changes.
+    Using st.cache_resource with a key-based hash.
     """
- 
-    def df_to_md(frame: pd.DataFrame, max_rows: int = 200) -> str:
-        return frame.head(max_rows).to_markdown(index=False)
- 
-    sections = [
-        # "## Raw Time Entries (sample)\n" + df_to_md(
-        #     df[["Employee", "Date", "Client (Harvest)", "Task", "Hours", "Type", "DateClass"]]
-        # ),
-        "## Employee Performance Summary\n" + df_to_md(emp_df),
-        "## Employee × Client Hours\n" + df_to_md(emp_client),
-        "## Client × Task Detail\n" + df_to_md(client_task),
-        "## Daily Hours Pivot (Employee × Date)\n" + df_to_md(hours_pivot),
-    ]
- 
-    return "\n\n---\n\n".join(sections)
+    @st.cache_resource(hash_funcs={str: lambda s: s})
+    def _build(key: str):
+        os.environ["API_KEY"] = key  # set BEFORE building
+        return build_summarizer_agent()
+
+    return _build(api_key)
 
 
 def render_tab_summary(
@@ -40,17 +25,6 @@ def render_tab_summary(
     client_task: pd.DataFrame,
     hours_pivot: pd.DataFrame,
 ) -> None:
-    """
-    Render the AI Summary tab.
- 
-    Parameters
-    ----------
-    df          : Filtered raw DataFrame (from apply_filters).
-    emp_df      : Employee performance aggregation (from render_tab_employee).
-    emp_client  : Employee × Client hours breakdown (from render_tab_employee).
-    client_task : Client × Task detail table (from render_tab_client).
-    hours_pivot : Daily pivot summary rows (from render_tab_pivot).
-    """
     st.markdown("#### 📝 AI Workforce Utilisation Report")
     st.markdown(
         '<p style="color:#64748b; font-size:0.92rem; margin-bottom:16px;">'
@@ -59,15 +33,30 @@ def render_tab_summary(
         "</p>",
         unsafe_allow_html=True,
     )
- 
-    # ── Controls row ─────────────────────────────────────────────────────
+
+    # ── Controls row ──────────────────────────────────────────────────────
     key_input, col_btn, col_info = st.columns([3, 1, 1], vertical_alignment="bottom")
-    os.environ["API_KEY"] = key_input.text_input(
+
+    # Persist the API key in session state so it survives reruns
+    if "api_key" not in st.session_state:
+        st.session_state["api_key"] = ""
+
+    api_key = key_input.text_input(
         label="GEMINI API KEY",
         type="password",
-        help="Get your API key from https://aistudio.google.com/api-keys"
+        value=st.session_state["api_key"],
+        key="api_key_input",
+        help="Get your API key from https://aistudio.google.com/api-keys",
     )
-    generate = col_btn.button("✨ Generate Report", type="primary", use_container_width=True)
+    # Sync back to session state
+    st.session_state["api_key"] = api_key
+
+    generate = col_btn.button(
+        "✨ Generate Report",
+        type="primary",
+        use_container_width=True,
+        disabled=not api_key.strip(),  # disable if no key
+    )
     col_info.markdown(
         f'<span style="color:#94a3b8; font-size:0.82rem;">'
         f"Analysing {df['Employee'].nunique()} employees · "
@@ -76,88 +65,71 @@ def render_tab_summary(
         unsafe_allow_html=True,
     )
 
-    agent = build_summarizer_agent()
-
     st.divider()
 
-    # ── Session-state cache so report survives reruns ─────────────────────
-    if "summary_report" not in st.session_state:
-        st.session_state["summary_report"] = None
-    if "summary_error" not in st.session_state:
-        st.session_state["summary_error"] = None
-    if "response_time" not in st.session_state:
-        st.session_state["response_time"] = None
-    if "total_tokens" not in st.session_state:
-        st.session_state["total_tokens"] = None
+    # ── Session-state cache ───────────────────────────────────────────────
+    for key in ("summary_report", "summary_error", "response_time", "total_tokens"):
+        st.session_state.setdefault(key, None)
 
     if generate:
-        st.session_state["summary_report"] = None
-        st.session_state["summary_error"] = None
-        st.session_state["response_time"] = None
-        st.session_state["total_tokens"] = None
+        if not api_key.strip():
+            st.warning("Please enter your Gemini API key before generating.")
+            return
+
+        # Reset state
+        for key in ("summary_report", "summary_error", "response_time", "total_tokens"):
+            st.session_state[key] = None
+
+        try:
+            # Agent is built/cached here, AFTER key is confirmed
+            agent = _get_agent(api_key.strip())
+        except Exception as exc:
+            st.error(f"⚠️ Failed to initialise agent: {exc}")
+            return
 
         prompt = _build_prompt(df, emp_df, emp_client, client_task, hours_pivot)
 
         with st.spinner("Analysing workforce data…"):
             try:
-                start_time = time.time()
+                start = time.time()
                 response = agent.run(prompt)
-                end_time = time.time()
-                
-                st.session_state["response_time"] = end_time - start_time
+                st.session_state["response_time"] = time.time() - start
                 st.session_state["total_tokens"] = response.metrics.total_tokens
- 
-                if hasattr(response, "content"):
-                    report_md = response.content
-                else:
-                    report_md = str(response)
- 
-                st.session_state["summary_report"] = report_md
- 
+                st.session_state["summary_report"] = (
+                    response.content if hasattr(response, "content") else str(response)
+                )
             except ImportError as exc:
                 st.session_state["summary_error"] = (
                     f"⚠️ Could not import the summarizer agent: `{exc}`. "
                     "Make sure `agno` is installed and your API key is configured."
                 )
-            except Exception as exc:  # noqa: BLE001
+            except Exception as exc:
                 st.session_state["summary_error"] = f"⚠️ Agent error: {exc}"
- 
-    # ── Render cached report or error ─────────────────────────────────────
+
+    # ── Render ────────────────────────────────────────────────────────────
     if st.session_state["summary_error"]:
         st.error(st.session_state["summary_error"])
- 
+
     elif st.session_state["summary_report"]:
         report_md: str = st.session_state["summary_report"]
         st.markdown(report_md)
 
         time_card, token_card, _, download_card = st.columns(
-            spec=(1, 1, 1, 1),
-            vertical_alignment="bottom"
+            spec=(1, 1, 1, 1), vertical_alignment="bottom"
         )
-        
         with time_card:
-            st.metric(
-                label="⏱️ Response Time",
-                value=f"{st.session_state['response_time']:.2f}s"
-            )
-
+            st.metric("⏱️ Response Time", f"{st.session_state['response_time']:.2f}s")
         with token_card:
-            st.metric(
-                label="🪙 Total Tokens",
-                value=f"{st.session_state['total_tokens']:,}"
-            )
-            
+            st.metric("🪙 Total Tokens", f"{st.session_state['total_tokens']:,}")
         with download_card:
             st.download_button(
                 label="⬇️ Download Report (Markdown)",
                 data=report_md,
                 file_name="harvest_utilisation_report.md",
                 mime="text/markdown",
-                use_container_width=False,
             )
- 
+
     else:
-        # Empty state
         st.markdown(
             """
             <div style="text-align:center; padding:60px 40px; color:#94a3b8;">
