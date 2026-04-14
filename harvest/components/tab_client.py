@@ -52,7 +52,7 @@ def render_tab_client(df: pd.DataFrame) -> None:
     # ── Detail table ─────────────────────────────────────────────────────
     st.markdown("#### Detail Table")
     client_task_df = (
-        df.groupby(["Client (Harvest)", "Task"])
+        df.groupby(["Client (Harvest)", "Project Name", "Task"])
         .agg(
             TotalHours=("Hours", "sum"),
             BillableHours=("Hours", lambda x: x[df.loc[x.index, "Billable"]].sum()),
@@ -67,6 +67,7 @@ def render_tab_client(df: pd.DataFrame) -> None:
     )
     display_client = client_task_df.rename(columns={
         "Client (Harvest)": "Client",
+        "Project Name": "Project",
         "Task": "Task",
         "TotalHours": "Total Hours",
         "BillableHours": "Billable Hours",
