@@ -46,7 +46,7 @@ def render_sidebar() -> tuple[pd.DataFrame | None, list, list, object, object]:
         # Date range
         min_d, max_d = df_raw["Date"].min(), df_raw["Date"].max()
         date_range = st.date_input(
-            "Date range", value=(min_d, max_d), min_value=min_d, max_value=max_d
+            "Date range", value=(min_d, max_d), min_value=min_d, max_value=max_d, format="YYYY-MM-DD"
         )
         start_d, end_d = (date_range if isinstance(date_range, tuple) and len(date_range) == 2
                           else (min_d, max_d))
