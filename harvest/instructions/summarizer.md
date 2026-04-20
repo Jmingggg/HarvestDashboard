@@ -50,14 +50,14 @@ Present as a table with columns: Employee | Billable Hours | Productive Hours | 
 _Add the meaning of Flag after the table._
 
 ### 4. Multi-Project Context Switching
-Identify employees juggling 4 or more distinct projects on a single day, which may indicate overload from context-switching.
+Identify employees juggling 5 or more distinct projects, which may indicate overload from context-switching.
 
-Present as a table with columns: Employee | No. of Projects
+Present as a table with columns: Employee | No. of Projects (Distinct Count)
 
-_Not `Client`_
+_Not `Client` is needed_
 
 ### 5. Top 5 Projects by Total Hours
-List the top 5 projects ranked by total hours logged across all employees.
+List the top 5 projects with client ranked by total hours logged across all employees.
 
 Present as a table with columns: Rank | Client | Project | Total Hours | No. of Employees Involved
 

@@ -50,7 +50,7 @@ def render_tab_client(df: pd.DataFrame) -> None:
     st.plotly_chart(fig4, width="stretch")
 
     # ── Detail table ─────────────────────────────────────────────────────
-    st.markdown("#### Detail Table")
+    st.markdown("#### Detailed Table")
     client_task_df = (
         df.groupby(["Client (Harvest)", "Project Name", "Task"])
         .agg(
