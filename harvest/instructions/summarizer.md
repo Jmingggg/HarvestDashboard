@@ -57,7 +57,9 @@ Present as a table with columns: Employee | No. of Projects | Projects
 ### 5. Top 5 Projects by Total Hours
 List the top 5 projects ranked by total hours logged across all employees.
 
-Present as a table with columns: Rank | Project Name | Total Hours | No. of Employees Involved
+Present as a table with columns: Rank | Project | Total Hours | No. of Employees Involved
+
+*Not Client (Hours)*
 
 ### 6. Team-Level Summary
 Summarise by team: total hours, billable rate, and headcount.
