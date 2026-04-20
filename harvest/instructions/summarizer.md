@@ -54,7 +54,7 @@ Identify employees juggling 5 or more distinct projects, which may indicate over
 
 Present as a table with columns: Employee | No. of Projects (Distinct Count)
 
-_Not `Client` is needed_
+_No `Client` is needed_
 
 ### 5. Top 5 Projects by Total Hours
 List the top 5 projects with client ranked by total hours logged across all employees.
