@@ -47,7 +47,7 @@ For each employee calculate:
 
 Present as a table with columns: Employee | Billable Hours | Productive Hours | Total Hours | Billable Rate | Flag
 
-_**Add the meaning of Flag after the table._
+_*Add the meaning of Flag after the table._
 
 ### 4. Multi-Project Context Switching
 Identify employees juggling 4 or more distinct projects on a single day, which may indicate overload from context-switching.
@@ -59,7 +59,7 @@ List the top 5 projects ranked by total hours logged across all employees.
 
 Present as a table with columns: Rank | Project | Total Hours | No. of Employees Involved
 
-*Not Client (Hours)*
+_**Not Client (Harvest)_
 
 ### 6. Team-Level Summary
 Summarise by team: total hours, billable rate, and headcount.
