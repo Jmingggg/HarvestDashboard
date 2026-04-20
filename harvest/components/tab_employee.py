@@ -36,9 +36,9 @@ def render_tab_employee(df: pd.DataFrame, start_d, end_d) -> None:
 
     # ── Stacked bar per employee ─────────────────────────────────────────
     fig5 = go.Figure()
-    fig5.add_trace(go.Bar(name="Billable",     x=emp_df["Employee"], y=emp_df["BillableHours"],    marker_color="#2563eb"))
+    fig5.add_trace(go.Bar(name="Billable", x=emp_df["Employee"], y=emp_df["BillableHours"],    marker_color="#2563eb"))
     fig5.add_trace(go.Bar(name="Non-Billable", x=emp_df["Employee"], y=emp_df["NonBillableHours"], marker_color="#f59e0b"))
-    fig5.add_trace(go.Bar(name="Out of Work",  x=emp_df["Employee"], y=emp_df["OutOfWorkHours"],   marker_color="#94a3b8"))
+    fig5.add_trace(go.Bar(name="Out of Work", x=emp_df["Employee"], y=emp_df["OutOfWorkHours"],   marker_color="#94a3b8"))
     fig5.add_hline(
         y=expected_hours,
         line=dict(color="#ef4444", width=2, dash="dash"),
@@ -84,15 +84,15 @@ def render_tab_employee(df: pd.DataFrame, start_d, end_d) -> None:
             unsafe_allow_html=True,
         )
 
-    # ── Per-employee client breakdown (3-col subplot grid) ───────────────
-    st.markdown("#### Client Hours per Employee")
-    emp_client  = df.groupby(["Employee", "Client (Harvest)"])["Hours"].sum().reset_index()
+    # ── Per-employee project breakdown (3-col subplot grid) ───────────────
+    st.markdown("#### Project Hours per Employee")
+    emp_project = df.groupby(["Employee", "Project Name"])["Hours"].sum().reset_index()
     all_employees = emp_df["Employee"].tolist()
     n_emp, n_cols = len(all_employees), 3
     n_rows = math.ceil(n_emp / n_cols)
 
-    all_clients   = sorted(emp_client["Client (Harvest)"].unique().tolist())
-    client_colors = {c: CLIENT_PALETTE[i % len(CLIENT_PALETTE)] for i, c in enumerate(all_clients)}
+    all_projects   = sorted(emp_project["Project Name"].unique().tolist())
+    project_colors = {p: CLIENT_PALETTE[i % len(CLIENT_PALETTE)] for i, p in enumerate(all_projects)}
 
     fig6 = make_subplots(
         rows=n_rows, cols=n_cols,
@@ -106,23 +106,23 @@ def render_tab_employee(df: pd.DataFrame, start_d, end_d) -> None:
         r = idx // n_cols + 1
         c = idx % n_cols + 1
         emp_data = (
-            emp_client[emp_client["Employee"] == emp]
+            emp_project[emp_project["Employee"] == emp]
             .sort_values("Hours", ascending=False)
         )
         for _, row in emp_data.iterrows():
-            client  = row["Client (Harvest)"]
-            show_lg = client not in legend_added
+            project  = row["Project Name"]
+            show_lg = project not in legend_added
             if show_lg:
-                legend_added.add(client)
+                legend_added.add(project)
             fig6.add_trace(
                 go.Bar(
-                    name=client,
-                    x=[client],
+                    name=project,
+                    x=[project],
                     y=[row["Hours"]],
-                    marker_color=client_colors[client],
+                    marker_color=project_colors[project],
                     showlegend=show_lg,
-                    legendgroup=client,
-                    hovertemplate=f"<b>{client}</b><br>{row['Hours']:.1f} hrs<extra>{emp}</extra>",
+                    legendgroup=project,
+                    hovertemplate=f"<b>{project}</b><br>{row['Hours']:.1f} hrs<extra>{emp}</extra>",
                 ),
                 row=r, col=c,
             )
@@ -135,4 +135,4 @@ def render_tab_employee(df: pd.DataFrame, start_d, end_d) -> None:
 
     st.plotly_chart(fig6, width="stretch")
 
-    return emp_df, emp_client
+    return emp_df, emp_project

@@ -49,15 +49,15 @@ Present as a table with columns: Employee | Billable Hours | Productive Hours | 
 
 _**Add the meaning of Flag after the table._
 
-### 4. Multi-Client Context Switching
-Identify employees juggling 4 or more distinct clients on a single day, which may indicate overload from context-switching.
+### 4. Multi-Project Context Switching
+Identify employees juggling 4 or more distinct projects on a single day, which may indicate overload from context-switching.
 
-Present as a table with columns: Employee | No. of Clients | Clients
+Present as a table with columns: Employee | No. of Projects | Projects
 
-### 5. Top 5 Clients by Total Hours
-List the top 5 clients ranked by total hours logged across all employees.
+### 5. Top 5 Projects by Total Hours
+List the top 5 projects ranked by total hours logged across all employees.
 
-Present as a table with columns: Rank | Client Name | Total Hours | No. of Employees Involved
+Present as a table with columns: Rank | Project Name | Total Hours | No. of Employees Involved
 
 ### 6. Team-Level Summary
 Summarise by team: total hours, billable rate, and headcount.
@@ -72,4 +72,4 @@ Use a bullet list to highlight:
 
 ---
 
-Be specific — name of employees and clients. Avoid vague generalisations.
+Be specific — name of employees and projects. Avoid vague generalisations.
