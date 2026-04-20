@@ -25,8 +25,8 @@ def _build_prompt(
         #     df[["Employee", "Date", "Client (Harvest)", "Task", "Hours", "Type", "DateClass"]]
         # ),
         "## Employee Performance Summary\n" + df_to_md(emp_df),
-        "## Employee × Client Hours\n" + df_to_md(emp_client),
-        "## Client × Task Detail\n" + df_to_md(client_task),
+        "## Employee × Project Hours\n" + df_to_md(emp_client.drop()),
+        "## Client × Task Detail with Project\n" + df_to_md(client_task.drop(columns=["Client"])),
         "## Daily Hours Pivot (Employee × Date)\n" + df_to_md(hours_pivot),
     ]
  
