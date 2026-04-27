@@ -1,16 +1,28 @@
 import os
+import datetime
 import pandas as pd
 import streamlit as st
 
 from harvest.utils import load_data
 
+BILLABLE_OPTIONS = ["Billable", "Non-Billable", "OOW"]
 
-def render_sidebar() -> tuple[pd.DataFrame | None, list, list, object, object]:
+
+def _last_week_range():
+    """Return (monday, sunday) of the previous calendar week."""
+    today = datetime.date.today()
+    # weekday(): Monday=0 … Sunday=6
+    last_monday = today - datetime.timedelta(days=today.weekday() + 7)
+    last_sunday = last_monday + datetime.timedelta(days=6)
+    return last_monday, last_sunday
+
+
+def render_sidebar() -> tuple[pd.DataFrame | None, list, list, list, object, object]:
     """
     Render the sidebar and return:
-        (df_raw, sel_clients, sel_employees, start_d, end_d)
+        (df_raw, sel_clients, sel_employees, sel_billable, start_d, end_d)
 
-    Returns (None, [], [], None, None) when no file has been uploaded yet.
+    Returns (None, [], [], [], None, None) when no file has been uploaded yet.
     """
     with st.sidebar:
         st.markdown("## 🌾 Harvest")
@@ -24,7 +36,7 @@ def render_sidebar() -> tuple[pd.DataFrame | None, list, list, object, object]:
         )
 
         if not uploaded:
-            return None, [], [], None, None
+            return None, [], [], [], None, None
 
         df_raw = load_data(uploaded)
 
@@ -43,13 +55,34 @@ def render_sidebar() -> tuple[pd.DataFrame | None, list, list, object, object]:
         if "All" in sel_employees or not sel_employees:
             sel_employees = employees_all
 
-        # Date range
+        # Billable type filter (Billable / Non-Billable / OOW)
+        sel_billable = st.multiselect(
+            "Billable",
+            ["All"] + BILLABLE_OPTIONS,
+            default=["All"],
+            help="Billable = billable hours, Non-Billable = internal/overhead, OOW = out of work.",
+        )
+        if "All" in sel_billable or not sel_billable:
+            sel_billable = BILLABLE_OPTIONS
+
+        # Date range – default to last week Monday → Sunday
         min_d, max_d = df_raw["Date"].min(), df_raw["Date"].max()
+        lw_mon, lw_sun = _last_week_range()
+        default_start = max(min_d, lw_mon)
+        default_end = min(max_d, lw_sun)
+        # Fallback: if last-week window is entirely outside data range use full range
+        if default_start > default_end:
+            default_start, default_end = min_d, max_d
+
         date_range = st.date_input(
-            "Date range", value=(min_d, max_d), min_value=min_d, max_value=max_d, format="YYYY-MM-DD"
+            "Date range",
+            value=(default_start, default_end),
+            min_value=min_d,
+            max_value=max_d,
+            format="YYYY-MM-DD",
         )
         start_d, end_d = (date_range if isinstance(date_range, tuple) and len(date_range) == 2
-                          else (min_d, max_d))
+                          else (default_start, default_end))
 
         st.divider()
         st.markdown('<p class="section-label">Legend</p>', unsafe_allow_html=True)
@@ -60,4 +93,4 @@ def render_sidebar() -> tuple[pd.DataFrame | None, list, list, object, object]:
             unsafe_allow_html=True,
         )
 
-    return df_raw, sel_clients, sel_employees, start_d, end_d
+    return df_raw, sel_clients, sel_employees, sel_billable, start_d, end_d

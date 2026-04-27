@@ -29,7 +29,7 @@ st.set_page_config(
 inject_css()
 
 # ─── Sidebar (upload + filters) ─────────────────────────────────────────────────
-df_raw, sel_clients, sel_employees, start_d, end_d = render_sidebar()
+df_raw, sel_clients, sel_employees, sel_billable, start_d, end_d = render_sidebar()
 
 # ─── Landing screen (no file uploaded) ──────────────────────────────────────────
 if df_raw is None:
@@ -47,7 +47,7 @@ if df_raw is None:
     st.stop()
 
 # ─── Filter ─────────────────────────────────────────────────────────────────────
-df = apply_filters(df_raw, sel_clients, sel_employees, start_d, end_d)
+df = apply_filters(df_raw, sel_clients, sel_employees, sel_billable, start_d, end_d)
 
 if df.empty:
     st.warning("No data matches the current filters.")
@@ -64,7 +64,7 @@ tab_overview, tab_client, tab_employee, tab_pivot, tab_summary = st.tabs([
 ])
 
 with tab_overview:
-    render_tab_overview(df, billable_h, nonbill_h, oow_h, util_rate)
+    render_tab_overview(df_raw, df, billable_h, nonbill_h, oow_h, util_rate)
 
 with tab_client:
     client_task = render_tab_client(df)

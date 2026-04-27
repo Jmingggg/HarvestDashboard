@@ -10,6 +10,7 @@ from ..utils.constants import PLOTLY_LAYOUT
 
 
 def render_tab_overview(
+    df_raw: pd.DataFrame,
     df: pd.DataFrame,
     billable_h: float,
     nonbill_h: float,
@@ -43,9 +44,9 @@ def render_tab_overview(
     # ── Line: daily billable trend ───────────────────────────────────────
     with c2:
         st.markdown("#### Daily Billable Trend")
-        daily   = df.groupby("Date")["Hours"].sum().reset_index()
+        daily   = df_raw.groupby("Date")["Hours"].sum().reset_index()
         daily["Date"] = pd.to_datetime(daily["Date"])
-        daily_b = df[df["Billable"]].groupby("Date")["Hours"].sum().reset_index()
+        daily_b = df_raw[df_raw["Billable"]].groupby("Date")["Hours"].sum().reset_index()
         daily_b["Date"] = pd.to_datetime(daily_b["Date"])
 
         fig2 = go.Figure()
@@ -68,9 +69,9 @@ def render_tab_overview(
 
     # ── Stacked bar: weekly ──────────────────────────────────────────────
     st.markdown("#### Weekly Hours by Type")
-    df = df.copy()
-    df["Week"] = pd.to_datetime(df["Date"]).dt.to_period("W").dt.start_time
-    weekly = df.groupby(["Week", "Type"])["Hours"].sum().reset_index()
+    weekly = df_raw.copy()
+    weekly["Week"] = pd.to_datetime(weekly["Date"]).dt.to_period("W").dt.start_time
+    weekly = weekly.groupby(["Week", "Type"])["Hours"].sum().reset_index()
     fig3 = px.bar(
         weekly, x="Week", y="Hours", color="Type",
         color_discrete_map={

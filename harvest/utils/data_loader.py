@@ -26,13 +26,27 @@ def apply_filters(
     df_raw: pd.DataFrame,
     sel_clients: list,
     sel_employees: list,
+    sel_billable: list,
     start_d,
     end_d,
 ) -> pd.DataFrame:
     """Return a filtered copy of df_raw based on sidebar selections."""
+    # Map friendly label → boolean column name
+    _BILLABLE_MAP = {
+        "Billable": "Billable",
+        "Non-Billable": "NonBillable",
+        "OOW": "Out of Work",
+    }
+    billable_mask = pd.Series(False, index=df_raw.index)
+    for label in sel_billable:
+        col = _BILLABLE_MAP.get(label)
+        if col and col in df_raw.columns:
+            billable_mask |= df_raw[col]
+
     return df_raw[
         df_raw["Client (Harvest)"].isin(sel_clients)
         & df_raw["Employee"].isin(sel_employees)
+        & billable_mask
         & df_raw["Date"].between(start_d, end_d)
     ].copy()
 
