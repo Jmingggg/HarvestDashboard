@@ -9,8 +9,13 @@ import plotly.graph_objects as go
 from ..utils.constants import PLOTLY_LAYOUT
 
 
-def render_tab_overview(df: pd.DataFrame, billable_h: float, nonbill_h: float,
-                         oow_h: float, util_rate: float) -> None:
+def render_tab_overview(
+    df: pd.DataFrame,
+    billable_h: float,
+    nonbill_h: float,
+    oow_h: float,
+    util_rate: float
+) -> None:
     c1, c2 = st.columns(2)
 
     # ── Donut: hour type split ───────────────────────────────────────────

@@ -94,10 +94,14 @@ def render_tab_employee(df: pd.DataFrame, start_d, end_d) -> None:
     all_projects   = sorted(emp_project["Project Name"].unique().tolist())
     project_colors = {p: CLIENT_PALETTE[i % len(CLIENT_PALETTE)] for i, p in enumerate(all_projects)}
 
+    # vertical_spacing must be < 1 / (rows - 1) when rows > 1
+    max_v_spacing = (1 / (n_rows - 1)) * 0.9 if n_rows > 1 else 0.14
+    v_spacing = min(0.14, max_v_spacing)
+
     fig6 = make_subplots(
         rows=n_rows, cols=n_cols,
         subplot_titles=all_employees,
-        vertical_spacing=0.14,
+        vertical_spacing=v_spacing,
         horizontal_spacing=0.06,
     )
 
