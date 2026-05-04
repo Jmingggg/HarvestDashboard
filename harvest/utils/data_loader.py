@@ -14,7 +14,7 @@ def load_data(file) -> pd.DataFrame:
     and classify each date as workday / weekend / holiday.
     """
     df = pd.read_csv(file)
-    df["Date"] = pd.to_datetime(df["Date"]).dt.date
+    df["Date"] = pd.to_datetime(df["Date"], format="mixed").dt.date
     df["Billable"] = df["Type"] == "Billable"
     df["Out of Work"] = df["Type"] == "Out of Work"
     df["NonBillable"] = (~df["Billable"]) & (~df["Out of Work"])
