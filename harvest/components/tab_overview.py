@@ -1,6 +1,6 @@
 """
 Tab 1 – Overview: donut chart, daily billable trend, weekly stacked bar,
-and a non-billable breakdown (project category × task).
+and a non-billable breakdown (project name x task).
 """
 import streamlit as st
 import pandas as pd
@@ -21,7 +21,7 @@ def render_tab_overview(
 ) -> None:
     c1, c2 = st.columns(2)
 
-    # ── Donut: hour type split ───────────────────────────────────────────
+    # Donut: hour type split
     with c1:
         st.markdown("#### Hours Breakdown")
         fig = go.Figure(go.Pie(
@@ -43,10 +43,10 @@ def render_tab_overview(
         fig.update_layout(**PLOTLY_LAYOUT, height=320)
         st.plotly_chart(fig, width="stretch")
 
-    # ── Line: daily billable trend ───────────────────────────────────────
+    # Line: daily billable trend
     with c2:
         st.markdown("#### Daily Billable Trend")
-        daily   = df_raw.groupby("Date")["Hours"].sum().reset_index()
+        daily = df_raw.groupby("Date")["Hours"].sum().reset_index()
         daily["Date"] = pd.to_datetime(daily["Date"])
         daily_b = df_raw[df_raw["Billable"]].groupby("Date")["Hours"].sum().reset_index()
         daily_b["Date"] = pd.to_datetime(daily_b["Date"])
@@ -69,7 +69,7 @@ def render_tab_overview(
                            xaxis=dict(gridcolor="#e2e8f0"))
         st.plotly_chart(fig2, width="stretch")
 
-    # ── Stacked bar: weekly ──────────────────────────────────────────────
+    # Stacked bar: weekly
     st.markdown("#### Weekly Hours by Type")
     weekly = df_raw.copy()
     weekly["Week"] = pd.to_datetime(weekly["Date"]).dt.to_period("W").dt.start_time
@@ -88,7 +88,7 @@ def render_tab_overview(
                        xaxis=dict(gridcolor="#e2e8f0"))
     st.plotly_chart(fig3, width="stretch")
 
-    # ── Non-Billable Breakdown ───────────────────────────────────────────
+    # Non-Billable Breakdown
     nb_df = df[df["NonBillable"]].copy()
     if nb_df.empty:
         return
@@ -97,35 +97,28 @@ def render_tab_overview(
     st.markdown(
         '<p style="color:#64748b; font-size:0.88rem; margin-top:-8px; margin-bottom:12px;">'
         "All hours logged as <strong>Productive</strong> (non-billable) — "
-        "broken down by internal category and task."
+        "broken down by project and task."
         "</p>",
         unsafe_allow_html=True,
     )
 
     col_left, col_right = st.columns(2)
 
-    # ── Left: sunburst – Project Category → Task ─────────────────────────
+    # Left: sunburst Project Name -> Task
     with col_left:
-        st.markdown("##### Category → Task (Sunburst)")
-
-        # Strip "Productive - " prefix to keep labels short
-        nb_df["Category"] = (
-            nb_df["Project Name"]
-            .str.replace(r"^Productive\s*[-–]\s*", "", regex=True)
-            .str.strip()
-        )
+        st.markdown("##### Project -> Task (Sunburst)")
 
         sun_df = (
-            nb_df.groupby(["Category", "Task"])["Hours"]
+            nb_df.groupby(["Project Name", "Task"])["Hours"]
             .sum()
             .reset_index()
         )
 
         fig_sun = px.sunburst(
             sun_df,
-            path=["Category", "Task"],
+            path=["Project Name", "Task"],
             values="Hours",
-            color="Category",
+            color="Project Name",
             color_discrete_sequence=[
                 "#f59e0b", "#fb923c", "#fbbf24", "#f97316",
                 "#fde68a", "#fdba74", "#fef3c7",
@@ -137,42 +130,38 @@ def render_tab_overview(
             hovertemplate="<b>%{label}</b><br>%{value:.1f} hrs<br>%{percentRoot:.1%} of total<extra></extra>",
             insidetextorientation="radial",
         )
-        fig_sun.update_layout(
-            **PLOTLY_LAYOUT,
-            height=400,
-        )
+        fig_sun.update_layout(**PLOTLY_LAYOUT, height=400)
         st.plotly_chart(fig_sun, width="stretch")
 
-    # ── Right: horizontal stacked bar – Task coloured by Category ────────
+    # Right: horizontal stacked bar Task coloured by Project Name
     with col_right:
-        st.markdown("##### Hours by Task (coloured by Category)")
+        st.markdown("##### Hours by Task (coloured by Project)")
 
-        task_cat_df = (
-            nb_df.groupby(["Task", "Category"])["Hours"]
+        task_proj_df = (
+            nb_df.groupby(["Task", "Project Name"])["Hours"]
             .sum()
             .reset_index()
         )
-        task_totals = task_cat_df.groupby("Task")["Hours"].sum().sort_values(ascending=True)
+        task_totals = task_proj_df.groupby("Task")["Hours"].sum().sort_values(ascending=True)
         ordered_tasks = task_totals.index.tolist()
 
-        cat_palette = {
-            cat: col for cat, col in zip(
-                nb_df["Category"].unique(),
-                ["#f59e0b", "#fb923c", "#fbbf24", "#f97316",
-                 "#fde68a", "#fdba74", "#fef3c7", "#d97706"],
-            )
-        }
+        all_projects = nb_df["Project Name"].unique().tolist()
+        palette = [
+            "#f59e0b", "#fb923c", "#fbbf24", "#f97316",
+            "#fde68a", "#fdba74", "#fef3c7", "#d97706",
+        ]
+        proj_palette = {proj: palette[i % len(palette)] for i, proj in enumerate(all_projects)}
 
         fig_bar = go.Figure()
-        for cat, grp in task_cat_df.groupby("Category"):
+        for proj, grp in task_proj_df.groupby("Project Name"):
             task_hours = {row["Task"]: row["Hours"] for _, row in grp.iterrows()}
             fig_bar.add_trace(go.Bar(
-                name=cat,
+                name=proj,
                 y=ordered_tasks,
                 x=[task_hours.get(t, 0) for t in ordered_tasks],
                 orientation="h",
-                marker_color=cat_palette.get(cat, "#f59e0b"),
-                hovertemplate=f"<b>{cat}</b><br>%{{y}}: %{{x:.1f}} hrs<extra></extra>",
+                marker_color=proj_palette.get(proj, "#f59e0b"),
+                hovertemplate=f"<b>{proj}</b><br>%{{y}}: %{{x:.1f}} hrs<extra></extra>",
             ))
 
         fig_bar.update_layout(
@@ -193,13 +182,13 @@ def render_tab_overview(
         ))
         st.plotly_chart(fig_bar, width="stretch")
 
-    # ── Summary table ────────────────────────────────────────────────────
+    # Summary table
     st.markdown("##### Non-Billable Summary Table")
     summary_df = (
-        nb_df.groupby(["Category", "Task"])
+        nb_df.groupby(["Project Name", "Task"])
         .agg(Hours=("Hours", "sum"), Entries=("Hours", "count"))
         .reset_index()
-        .sort_values(["Category", "Hours"], ascending=[True, False])
+        .sort_values(["Project Name", "Hours"], ascending=[True, False])
     )
     summary_df["Hours"] = summary_df["Hours"].round(2)
     total_nb = summary_df["Hours"].sum()
